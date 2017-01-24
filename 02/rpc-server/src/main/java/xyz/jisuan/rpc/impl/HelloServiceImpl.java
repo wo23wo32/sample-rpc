@@ -11,7 +11,9 @@ import xyz.jisuan.rpc.api.HelloService;
  * </ul>
  */
 public class HelloServiceImpl implements HelloService {
-	public void sayHello(String name) {
-		System.out.println("hello, "+name+"!");
+	public String sayHello(String name) {
+		String print = "hello, " + name + "!";
+		System.out.println(print);
+		return print;
 	}
 }

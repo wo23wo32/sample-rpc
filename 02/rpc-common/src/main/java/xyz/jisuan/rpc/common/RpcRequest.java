@@ -1,5 +1,7 @@
 package xyz.jisuan.rpc.common;
 
+import java.io.Serializable;
+
 /**
  * <p>project：sample-rpc<p>
  * <ul>
@@ -8,11 +10,11 @@ package xyz.jisuan.rpc.common;
  * <li>function:</li>
  * </ul>
  */
-public class RpcRequest {
+public class RpcRequest implements Serializable{
 
 	private String service;
 	private String method;
-	private String parameters;
+	private Class<?>[] parameters;
 	private Object[] args;
 
 	public String getService() {
@@ -31,11 +33,11 @@ public class RpcRequest {
 		this.method = method;
 	}
 
-	public String getParameters() {
+	public Class<?>[] getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(String parameters) {
+	public void setParameters(Class<?>[] parameters) {
 		this.parameters = parameters;
 	}
 

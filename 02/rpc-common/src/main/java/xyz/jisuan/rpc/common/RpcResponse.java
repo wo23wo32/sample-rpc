@@ -1,5 +1,7 @@
 package xyz.jisuan.rpc.common;
 
+import java.io.Serializable;
+
 /**
  * <p>project：sample-rpc<p>
  * <ul>
@@ -8,5 +10,15 @@ package xyz.jisuan.rpc.common;
  * <li>function:</li>
  * </ul>
  */
-public class RpcResponse {
+public class RpcResponse implements Serializable{
+
+	private Object data;
+
+	public Object getData() {
+		return data;
+	}
+
+	public void setData(Object data) {
+		this.data = data;
+	}
 }

@@ -1,11 +1,19 @@
 package xyz.jisuan.rpc;
 
 import xyz.jisuan.rpc.api.HelloService;
+import xyz.jisuan.rpc.common.RpcRequest;
+import xyz.jisuan.rpc.common.RpcResponse;
 import xyz.jisuan.rpc.impl.HelloServiceImpl;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  * <p>project：simple-rpc<p>
@@ -17,21 +25,33 @@ import java.lang.reflect.Proxy;
  */
 public class Main {
 
-//	private static HelloService helloService = new HelloServiceImpl();
-	private static HelloService helloService;
+	private static HelloService helloService = new HelloServiceImpl();
 
-	static {
-		helloService = (HelloService) Proxy.newProxyInstance(HelloService.class.getClassLoader(), new Class[]{HelloService.class}, new InvocationHandler() {
-			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-				System.out.println("enter, method:"+method.getName()+",args:"+args[0].toString());
-				HelloServiceImpl helloService = new HelloServiceImpl();
-				method.invoke(helloService, args);
-				return null;
+	public static void main(String[] args) throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InterruptedException {
+		ServerSocket serverSocket = new ServerSocket(11111);
+		System.out.println("server started.....");
+
+		Socket socket = serverSocket.accept();
+		ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+		Object obj = objectInputStream.readObject();
+
+		if(obj instanceof RpcRequest) {
+			RpcRequest rpcRequest = (RpcRequest) obj;
+			String service = rpcRequest.getService();
+			switch (service) {
+				case "HelloService":
+					Method method = HelloService.class.getMethod(rpcRequest.getMethod(), rpcRequest.getParameters());
+					Object invoke = method.invoke(helloService, rpcRequest.getArgs());
+					RpcResponse rpcResponse = new RpcResponse();
+					rpcResponse.setData(invoke);
+
+					ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+					objectOutputStream.writeObject(rpcResponse);
+					objectOutputStream.flush();
+
 			}
-		});
-	}
-
-	public static void main(String[] args) {
-		helloService.sayHello("world");
+		}
+		socket.close();
+		serverSocket.close();
 	}
 }

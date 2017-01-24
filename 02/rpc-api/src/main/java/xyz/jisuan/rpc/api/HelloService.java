@@ -10,5 +10,5 @@ package xyz.jisuan.rpc.api;
  */
 public interface HelloService {
 
-	void sayHello(String name);
+	String sayHello(String name);
 }
